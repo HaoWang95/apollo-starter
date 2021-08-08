@@ -1,7 +1,8 @@
 // import apollo-server
 const { ApolloServer, gql } = require('apollo-server');
 
-const SessionAPI = require('./data-source/session')
+const SessionAPI = require('./data-source/session');
+const SpeakerAPI = require('./data-source/speakers');
 
 /**
  * Three steps for now to create a graphql server, after installing all the dependencies,
@@ -15,8 +16,16 @@ const SessionAPI = require('./data-source/session')
 // define the graphql query definitions
 const typeDefs = gql`
     type Query{
-        sessions:[Session]
+        sessions: [Session]
         sessionById(id: ID): Session
+        speakers: [Speaker]
+        speakerById(id: ID): Speaker
+    }
+    type Speaker{
+        id: ID!,
+        bio: String,
+        sessions:[Session],
+        name: String
     }
     type Session {
         id: ID!,
@@ -40,18 +49,24 @@ const resolvers = {
 
         sessionById: (parent, {id}, {dataSources}, info) => {
             return dataSources.SessionAPI.getSessionById(id)
+        },
+
+        speakers: (parent, args, {dataSources}, info) => {
+            return dataSources.SpeakerAPI.getSpeakers();
         }
     }
 }
 
 const dataSources = () => ({
-    SessionAPI: new SessionAPI()
+    SessionAPI: new SessionAPI(),
+    SpeakerAPI: new SpeakerAPI(),
 })
+
 
 // typeDefs -> the graphQL schema
 // resolvers -> the controller function
 // dataSources -> the service layer that interacts with data
-const server = new ApolloServer({typeDefs, resolvers, dataSources});
+const server = new ApolloServer({typeDefs, resolvers, dataSources,});
 
 server.listen({port: process.env.PORT || 4000})
     .then(
