@@ -3,6 +3,15 @@ const { ApolloServer, gql } = require('apollo-server');
 
 const SessionAPI = require('./data-source/session')
 
+/**
+ * Three steps for now to create a graphql server, after installing all the dependencies,
+ * 1. create a datasource/connect to a datasource and implement the service 
+ * 2. use gql to create basic operation schemas
+ * 3. use resolver to call the gql operations
+ * 
+ * After that, init the apolloserver and pass through the gql, resolvers and datasource
+ */
+
 // define the graphql query definitions
 const typeDefs = gql`
     type Query{
